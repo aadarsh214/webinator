@@ -1,3 +1,66 @@
 "use strict";
-require("dotenv").config();
-console.log(process.env.GEMINI_API_KEY);
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const generative_ai_1 = require("@google/generative-ai");
+const fs = __importStar(require("fs"));
+require("dotenv").config(); // Load environment variables from .env file
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+    throw new Error("API key is not defined. Please set GEMINI_API_KEY in your .env file.");
+}
+const genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+function fileToGenerativePart(path, mimeType) {
+    return {
+        inlineData: {
+            data: Buffer.from(fs.readFileSync(path)).toString("base64"),
+            mimeType,
+        },
+    };
+}
+function generateContent() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const prompt = "Describe how this product might be manufactured.";
+        const imagePart = fileToGenerativePart("/path/to/image.png", "image/png");
+        try {
+            const result = yield model.generateContent([prompt, imagePart]);
+            console.log(result.response.text());
+        }
+        catch (error) {
+            console.error("Error generating content:", error);
+        }
+    });
+}
+// Call the function to execute the request
+generateContent();

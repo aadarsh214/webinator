@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import * as fs from 'fs';
-require("dotenv").config(); // Load environment variables from .env file
+require("dotenv").config(); //import unsuccessfuls
 
 
 const apiKey = process.env.GEMINI_API_KEY;
